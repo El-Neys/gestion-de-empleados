@@ -1,0 +1,163 @@
+
+<div class="contenedor">
+  <header class="encabezado">
+    <div>
+      <h1>Gestión de Empleados</h1>
+      <p>Administra la información de tus empleados</p>
+    </div>
+    <span class="etiqueta">Sistema administrativo</span>
+  </header>
+
+  <section class="panel">
+    <h2>{{ empleadoEditando ? 'Editar empleado' : 'Registrar empleado' }}</h2>
+
+    <form (ngSubmit)="registrarEmpleado()">
+      <div class="campos">
+        <div class="campo">
+          <label for="nombre">Nombre completo</label>
+          <input
+            id="nombre"
+            name="nombre"
+            type="text"
+            placeholder="Ej. Laura Pérez"
+            [(ngModel)]="nombre"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="posicion">Posición</label>
+          <input
+            id="posicion"
+            name="posicion"
+            type="text"
+            placeholder="Ej. Administradora"
+            [(ngModel)]="posicion"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="oficina">Oficina</label>
+          <input
+            id="oficina"
+            name="oficina"
+            type="text"
+            placeholder="Ej. Principal"
+            [(ngModel)]="oficina"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="salario">Salario</label>
+          <input
+            id="salario"
+            name="salario"
+            type="number"
+            min="0"
+            step="any"
+            placeholder="Ej. 2500000"
+            [(ngModel)]="salario"
+            required>
+        </div>
+      </div>
+
+      <div class="acciones-formulario">
+        <button type="submit" [disabled]="guardando">
+          {{
+            guardando
+              ? 'Guardando...'
+              : empleadoEditando
+                ? 'Guardar cambios'
+                : 'Registrar empleado'
+          }}
+        </button>
+
+        <button
+          *ngIf="empleadoEditando"
+          type="button"
+          class="boton-secundario"
+          (click)="limpiarFormulario()">
+          Cancelar edición
+        </button>
+      </div>
+
+      <p *ngIf="mensaje" class="mensaje-exito" role="status">
+        {{ mensaje }}
+      </p>
+
+      <p *ngIf="error" class="mensaje-error" role="alert">
+        {{ error }}
+      </p>
+    </form>
+  </section>
+
+  <section class="panel">
+    <div class="titulo-tabla">
+      <div>
+        <h2>Lista de empleados</h2>
+        <p>Consulta y administra los registros</p>
+      </div>
+      <span class="contador">
+        {{ empleados.length }} empleados
+      </span>
+    </div>
+
+    <p *ngIf="cargando" class="estado">
+      Cargando empleados...
+    </p>
+
+    <div *ngIf="errorCarga" class="mensaje-error" role="alert">
+      <p>{{ errorCarga }}</p>
+      <button type="button" class="boton-secundario" (click)="cargarEmpleados()">
+        Reintentar
+      </button>
+    </div>
+
+    <div class="tabla-contenedor" *ngIf="!cargando">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Posición</th>
+            <th>Oficina</th>
+            <th>Salario</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngIf="!errorCarga && empleados.length === 0">
+            <td colspan="5" class="estado">
+              Todavía no hay empleados registrados.
+            </td>
+          </tr>
+
+          <tr *ngFor="let empleado of empleados">
+            <td>{{ empleado.nombre }}</td>
+            <td>{{ empleado.posicion }}</td>
+            <td>{{ empleado.oficina }}</td>
+            <td>
+              {{ empleado.salario | currency:'COP':'symbol':'1.0-0' }}
+            </td>
+            <td class="acciones-tabla">
+              <button
+                type="button"
+                class="boton-editar"
+                [disabled]="eliminandoId !== null"
+                (click)="editarEmpleado(empleado)">
+                Editar
+              </button>
+
+              <button
+                type="button"
+                class="boton-eliminar"
+                [disabled]="eliminandoId !== null"
+                (click)="eliminarEmpleado(empleado)">
+                {{ eliminandoId === empleado._id ? 'Eliminando...' : 'Eliminar' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
